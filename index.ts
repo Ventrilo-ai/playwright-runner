@@ -1,5 +1,7 @@
 import { chromium } from "playwright";
 
+const DEFAULT_CHROMIUM_SWITCHES = ["--single-process"];
+
 async function main() {
     if (process.argv.length !== 3) {
         console.log("Usage: node index.js <url>");
@@ -7,8 +9,13 @@ async function main() {
     }
 
     const url = process.argv[2];
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const browser = await chromium.launch({ args: DEFAULT_CHROMIUM_SWITCHES });
+    const context = await browser.newContext({
+        userAgent:
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        viewport: { width: 1280, height: 720 }
+    });
+    const page = await context.newPage();
 
     page.on("console", msg => {
         console.log(`Console message: ${msg.text()}`);
